@@ -1,22 +1,64 @@
-import React, {Component} from 'react';
+import React, {Component, Fragment, useState} from 'react';
 import {
   Typography,
   Button,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  FormHelperText,
 } from '@material-ui/core';
 import { useSpeechSynthesis } from "react-speech-kit";
 import './App.css';
 
-function Speech(props) {
-  const { speak } = useSpeechSynthesis();
+const Speech = (props) => {
+  const [voiceIndex, setVoiceIndex] = useState(0);
+  const {
+    speak,
+    cancel,
+    speaking,
+    supported,
+    voices
+  } = useSpeechSynthesis();
 
   return (
-    <Button
-      fullWidth
-      disableElevation
-      size='large'
-      variant='contained'
-      color='primary'
-      onClick={() => speak({ text: props.text })}>SPEAK</Button>
+    <Fragment>
+      <Button
+        fullWidth
+        disableElevation
+        size='large'
+        variant='contained'
+        color='primary'
+        onClick={() => speaking ? cancel() : speak({ text: props.text, voice: voices[voiceIndex] })}>
+        {speaking ? "STOP" : "SPEAK"}
+      </Button>
+
+      <FormControl fullWidth>
+        <InputLabel id="voice">Voice</InputLabel>
+        <Select
+          labelId="voice"
+          id="voice-picker"
+          value={voiceIndex}
+          onChange={(event) => { setVoiceIndex(event.target.value); }}
+        >
+          {voices.map((option, index) => (
+            <MenuItem key={option.voiceURI} value={index}>
+              {`${option.lang} - ${option.name}`}
+            </MenuItem>
+          ))}
+        </Select>
+        <FormHelperText>Pick a voice that fits you!</FormHelperText>
+      </FormControl>
+
+      {supported ? (
+        <Fragment />
+      ) : (
+        <Typography variant="body1" style={{marginTop: 10}}>
+          Not working? Your browser may not support speech synthesis!<br/>
+          Please try this demo again on Chrome on your computer for best results!
+        </Typography>
+      )}
+    </Fragment>
   );
 }
 
@@ -42,6 +84,9 @@ class App extends Component {
     return (
       <div className="App">
         <header className="App-header">
+          <Typography variant='h5' style={{marginTop: 5}}>
+            Welcome to BlipBugaTron 5000
+          </Typography>
           <Typography variant='h1' style={{margin: 10}}>
             {this.state.thebleep}
           </Typography>
@@ -49,14 +94,6 @@ class App extends Component {
           <table>
             <tbody>
               <tr>
-                <td>
-                  <Button
-                    fullWidth
-                    disableElevation
-                    size='large'
-                    variant='outlined'
-                    onClick={()=>{this.bop('thank')}}>thank</Button>
-                </td>
                 <td>
                   <Button
                     fullWidth
@@ -107,14 +144,6 @@ class App extends Component {
                     disableElevation
                     size='large'
                     variant='outlined'
-                    onClick={()=>{this.bop('you')}}>you</Button>
-                </td>
-                <td>
-                  <Button
-                    fullWidth
-                    disableElevation
-                    size='large'
-                    variant='outlined'
                     onClick={()=>{this.bop('Mom')}}>Mom</Button>
                 </td>
                 <td>
@@ -136,14 +165,6 @@ class App extends Component {
               </tr>
 
               <tr>
-                <td>
-                  <Button
-                    fullWidth
-                    disableElevation
-                    size='large'
-                    variant='outlined'
-                    onClick={()=>{this.bop('please')}}>please</Button>
-                </td>
                 <td>
                   <Button
                     fullWidth
@@ -209,14 +230,6 @@ class App extends Component {
                     disableElevation
                     size='large'
                     variant='outlined'
-                    onClick={()=>{this.bop('help')}}>help</Button>
-                </td>
-                <td>
-                  <Button
-                    fullWidth
-                    disableElevation
-                    size='large'
-                    variant='outlined'
                     onClick={()=>{this.bop('know')}}>know</Button>
                 </td>
               </tr>
@@ -254,7 +267,45 @@ class App extends Component {
                     variant='outlined'
                     onClick={()=>{this.bop('disgusted')}}>disgusted</Button>
                 </td>
+              </tr>
+
+              <tr>
                 <td>
+                  <Button
+                    fullWidth
+                    disableElevation
+                    size='large'
+                    variant='outlined'
+                    onClick={()=>{this.bop('thank')}}>thank</Button>
+                </td>
+                <td>
+                  <Button
+                    fullWidth
+                    disableElevation
+                    size='large'
+                    variant='outlined'
+                    onClick={()=>{this.bop('you')}}>you</Button>
+                </td>
+                <td>
+                  <Button
+                    fullWidth
+                    disableElevation
+                    size='large'
+                    variant='outlined'
+                    onClick={()=>{this.bop('help')}}>help</Button>
+                </td>
+                <td>
+                  <Button
+                    fullWidth
+                    disableElevation
+                    size='large'
+                    variant='outlined'
+                    onClick={()=>{this.bop('please')}}>please</Button>
+                </td>
+              </tr>
+
+              <tr>
+                <td colspan='4'>
                   <Speech text={this.state.thebleep} />
                 </td>
               </tr>
